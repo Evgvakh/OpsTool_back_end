@@ -3,11 +3,13 @@ import mongoose from "mongoose";
 const GuideSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        required: true
+        required: true,
+        set: v => v.toLowerCase()
     },
     lastName: {
         type: String,
-        required: true
+        required: true,
+        set: v => v.toLowerCase()
     },
     residence: {
         type: String,
@@ -17,7 +19,8 @@ const GuideSchema = new mongoose.Schema({
         type: String
     },
     email: {
-        type: String
+        type: String,
+        set: v => v.toLowerCase()
     },
     bookings: [
         {

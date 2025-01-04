@@ -20,14 +20,7 @@ const UserSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true
-    },
-    permissons: [
-        {
-            operation: {
-                type: String                
-            },
-        }
-    ],
+    },    
     callsPermissons: [
         {
             callID: {

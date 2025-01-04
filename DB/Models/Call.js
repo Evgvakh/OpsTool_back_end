@@ -5,6 +5,10 @@ const CallSchema = new mongoose.Schema({
         type: String,
         required: true        
     },
+    type: {
+        type: String,
+        enum: ['SHX', 'TRN']
+    },
     port: {
         type: String,
         required: true

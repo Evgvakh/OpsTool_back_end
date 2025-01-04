@@ -5,10 +5,13 @@ import { connectToDB } from './DB/DB.js'
 
 import { addNewGuide, addGuideBooking, findGuideByID, getAllGuides, removeGuideBooking, addGuideLanguage, addGuideTextField, addGuideWorkedHours, removeAllGuidesBookings } from './controllers/GuidesController.js';
 import { addCompany, addLanguage, addPort, addResidence, addShip, getCompanies, getLanguages, getPorts, getResidences, getShips } from './controllers/Misc.js'
-import { addCall, getCalls } from './controllers/CallsController.js';
+import { addCall, editCallField, getCalls } from './controllers/CallsController.js';
 import { addComment, editComment, getComments } from './controllers/CommentController.js';
-import { addUser, getUsers, userLogin, getRoles, addUserRole } from './controllers/UsersController.js';
+import { addUser, getUsers, userLogin, getRoles, addUserRole, assignCallToUser, removeCallFromUser } from './controllers/UsersController.js';
 import { verifyToken } from './Utils/VerifyToken.js';
+import { checkIfAdmin } from './Utils/CheckIsAdmin.js';
+import { celebrate, errors } from 'celebrate';
+import { userValidationSchema } from './validators/UserValidations.js';
 
 const app = express()
 await connectToDB();
@@ -17,29 +20,34 @@ app.use(express.json())
 
 app.get('/guides/get', getAllGuides)
 app.get('guide/get/:id', findGuideByID)
+app.post('/guide/add', checkIfAdmin, addNewGuide)
+app.post('/guide/add/booking', addGuideBooking)
+app.post('/guide/add/workedhours', addGuideWorkedHours)
+app.post('/guides/bookings/removeAll', removeAllGuidesBookings)
+app.patch('/guide/add/language', checkIfAdmin, addGuideLanguage)
+app.patch('/guide/add/textfield', checkIfAdmin, addGuideTextField)
+app.patch('/guide/remove/booking', removeGuideBooking)
+
 app.get('/users/get', getUsers)
 app.get('/users/get/role', getRoles)
 app.post('/user/login', userLogin)
 app.post('/user/check/token', verifyToken)
-app.post('/guide/add', addNewGuide)
-app.post('/guide/add/booking', addGuideBooking)
-app.post('/guide/add/workedhours', addGuideWorkedHours)
-app.post('/guides/bookings/removeAll', removeAllGuidesBookings)
-app.post('/user/add', addUser)
-app.post('/userrole/add', addUserRole)
-app.patch('/guide/add/language', addGuideLanguage)
-app.patch('/guide/add/textfield', addGuideTextField)
-app.patch('/guide/remove/booking', removeGuideBooking)
+app.post('/user/add', checkIfAdmin, celebrate({body: userValidationSchema}), addUser)
+app.patch('/users/remove_call_permission', checkIfAdmin, removeCallFromUser)
 
-app.post('/residence/add', addResidence)
-app.post('/ship/add', addShip)
-app.post('/company/add', addCompany)
-app.post('/port/add', addPort)
-app.post('/call/add', addCall)
-app.patch('/language/add', addLanguage)
+app.get('/calls/get', getCalls)
+app.patch('/calls/assign_user', assignCallToUser)
+app.post('/call/add', checkIfAdmin, addCall)
+app.patch('/call/edit_one_field/:field', editCallField)
+
+app.post('/residence/add', checkIfAdmin, addResidence)
+app.post('/ship/add', checkIfAdmin, addShip)
+app.post('/company/add', checkIfAdmin, addCompany)
+app.post('/port/add', checkIfAdmin, addPort)
+app.post('/userrole/add', checkIfAdmin, addUserRole)
+app.patch('/language/add', checkIfAdmin, addLanguage)
 
 app.get('/residences/get', getResidences)
-app.get('/calls/get', getCalls)
 app.get('/companies/get', getCompanies)
 app.get('/ports/get', getPorts)
 app.get('/ships/get', getShips)
@@ -49,7 +57,11 @@ app.post('/comment/add', addComment)
 app.get('/comments/get', getComments)
 app.put('/comment/edit', editComment)
 
-
+app.use(errors())
+app.use((err, req, res, next) => {
+    console.error(err.stack); 
+    res.status(500).send({ errorMessage: err.message || 'Internal Server Error', data: null });
+});
 
 app.listen(4040, (err) => {
     if (err) {

@@ -1,7 +1,7 @@
 import Call from "../DB/Models/Call.js";
 
 export const addCall = async (req, res) => {
-    try {        
+    try {
         const data = new Call({
             date: req.body.date,
             port: req.body.port,
@@ -14,7 +14,7 @@ export const addCall = async (req, res) => {
         res.json(data)
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -42,13 +42,34 @@ export const getCalls = async (req, res) => {
             },
             {
                 $unwind: {
-                    path: '$portDetails',
+                    path: '$portDetails', 
                     preserveNullAndEmptyArrays: true
                 }
             },
             {
                 $addFields: {
                     portCode: '$portDetails.code'
+                }
+            },            
+            {
+                $lookup: {
+                    from: 'users',
+                    let: { callId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: [
+                                        { $toString: '$$callId' }, 
+                                        '$callsPermissons.callID']
+                                }
+                            }
+                        },
+                        { 
+                            $project: { _id: 1 } 
+                        }
+                    ],
+                    as: 'assignedUsers'
                 }
             },
             {
@@ -67,4 +88,11 @@ export const getCalls = async (req, res) => {
         console.log(err);
         res.status(400).send(err)
     }
+}
+
+export const editCallField = async (req, res) => {
+    const data = await Call.updateOne({_id: req.body.callId}, {
+        $set: { [req.params.field]:  req.body.name}
+    })
+    res.send(data)
 }

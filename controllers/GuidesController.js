@@ -1,8 +1,13 @@
 import Guide from "../DB/Models/Guide.js";
 
-export const addNewGuide = async (req, res) => {
+export const addNewGuide = async (req, res) => {    
     try {
         const { firstName, lastName, residence, phone, email, languages } = req.body
+        const isExistingGuide = await Guide.findOne({firstName: firstName, lastName: lastName})
+
+        if(isExistingGuide) {     
+            throw new Error('Guide already exists')
+        }
         const document = new Guide({
             firstName: firstName,
             lastName: lastName,
@@ -15,7 +20,7 @@ export const addNewGuide = async (req, res) => {
         res.status(201).json(document)
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({errorMessage: err.message, data: null})
     }
 }
 
