@@ -28,8 +28,8 @@ export const getPorts = async (req, res) => {
         const data = await Port.find({}).sort({name: 1})
         res.json(data)
     } catch (err) {
-        console.log(err)
-        res.status(400).send(err) 
+        console.log(err);
+        res.status(404).send({ errorMessage: err }) 
     }
 }
 
@@ -55,8 +55,8 @@ export const getCompanies = async (req, res) => {
         const data = await Company.find({}).sort({name: 1})
         res.json(data)
     } catch (err) {
-        console.log(err)
-        res.status(400).send(err) 
+        console.log(err);
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -101,8 +101,8 @@ export const addLanguage = async (req, res) => {
         await data.save()
         res.json(data)
     } catch (err) {
-        console.log(err)
-        res.status(400).json({message: err.message, data: null})
+        console.log(err);
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -111,8 +111,8 @@ export const getLanguages = async (req, res) => {
         const data = await Language.find({}).sort({name: 1})
         res.json(data)
     } catch (err) {
-        console.log(err)
-        res.status(400).send(err) 
+        console.log(err);
+        res.status(404).send({ errorMessage: err }) 
     }
 }
 
@@ -138,8 +138,34 @@ export const getResidences = async (req, res) => {
         const data = await GuidesResidence.find({}).sort({name: 1})
         res.json(data)
     } catch (err) {
-        console.log(err)
-        res.status(400).send(err) 
+        console.log(err);
+        res.status(404).send({ errorMessage: err })
     }
 }
 
+export const addUserRole = async (req, res) => {
+    try {
+        const ifExist = await Role.findOne({ name: req.body.name })
+        if (ifExist) {
+            throw new Error('This role already exists')
+        }
+        const data = new Role({
+            name: req.body.name
+        })
+        await data.save()
+        res.json(data)
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err.message, data: null })
+    }
+}
+
+export const getRoles = async (req, res) => {
+    try {
+        const data = await Role.find({}).sort({ name: 1 })
+        res.json(data)
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err.message, data: null })
+    }
+}

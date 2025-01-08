@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
+    station: {
+        type: String
+    },
     firstName: {
         type: String,
         required: true

@@ -29,8 +29,8 @@ export const getAllGuides = async (req, res) => {
         const data = await Guide.find().sort({ lastName: 1 })
         res.json(data)
     } catch (err) {
-        console.log(err); 
-        res.status(400).send(err)
+        console.log(err);
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -52,7 +52,7 @@ export const addGuideBooking = async (req, res) => {
         res.json(data)
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -65,7 +65,7 @@ export const removeGuideBooking = async (req, res) => {
         res.json(data)
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -88,7 +88,7 @@ export const addGuideLanguage = async (req, res) => {
         res.json(data);
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -105,7 +105,7 @@ export const addGuideTextField = async (req, res) => {
         res.json(data)
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -138,7 +138,7 @@ export const addGuideWorkedHours = async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 

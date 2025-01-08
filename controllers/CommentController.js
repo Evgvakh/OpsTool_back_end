@@ -14,7 +14,7 @@ export const addComment = async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -37,7 +37,7 @@ export const editComment = async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 
@@ -47,6 +47,6 @@ export const getComments = async (req, res) => {
         res.json(data)
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }

@@ -3,6 +3,7 @@ import Call from "../DB/Models/Call.js";
 export const addCall = async (req, res) => {
     try {
         const data = new Call({
+            type: req.body.type,
             date: req.body.date,
             port: req.body.port,
             company: req.body.company,
@@ -42,7 +43,7 @@ export const getCalls = async (req, res) => {
             },
             {
                 $unwind: {
-                    path: '$portDetails', 
+                    path: '$portDetails',
                     preserveNullAndEmptyArrays: true
                 }
             },
@@ -50,7 +51,7 @@ export const getCalls = async (req, res) => {
                 $addFields: {
                     portCode: '$portDetails.code'
                 }
-            },            
+            },
             {
                 $lookup: {
                     from: 'users',
@@ -60,13 +61,13 @@ export const getCalls = async (req, res) => {
                             $match: {
                                 $expr: {
                                     $in: [
-                                        { $toString: '$$callId' }, 
+                                        { $toString: '$$callId' },
                                         '$callsPermissons.callID']
                                 }
                             }
                         },
-                        { 
-                            $project: { _id: 1 } 
+                        {
+                            $project: { _id: 1 }
                         }
                     ],
                     as: 'assignedUsers'
@@ -86,13 +87,18 @@ export const getCalls = async (req, res) => {
         res.status(200).send(calls)
     } catch (err) {
         console.log(err);
-        res.status(400).send(err)
+        res.status(400).send({ errorMessage: err })
     }
 }
 
 export const editCallField = async (req, res) => {
-    const data = await Call.updateOne({_id: req.body.callId}, {
-        $set: { [req.params.field]:  req.body.name}
-    })
-    res.send(data)
+    try {
+        const data = await Call.updateOne({ _id: req.body.callId }, {
+            $set: { [req.params.field]: req.body.value }
+        })
+        res.send(data)
+    } catch (err) {
+        console.log(err);
+        res.status(400).send({ errorMessage: err })
+    }
 }

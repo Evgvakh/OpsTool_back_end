@@ -10,7 +10,7 @@ export const verifyToken = async (req, res) => {
         const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN_KEY)
         const user = await User.findById(req.body.userID)
         if (decodedToken.id == user._id && decodedToken.role === user.role) {
-            res.json({ isAuthOK: true, userRole: user.role })
+            res.json({ isAuthOK: true, userRole: user.role, assignedCalls: user.callsPermissons })
         } else {
             res.json({ isAuthOK: false })
         }
