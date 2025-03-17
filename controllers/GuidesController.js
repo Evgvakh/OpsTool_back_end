@@ -2,19 +2,23 @@ import Guide from "../DB/Models/Guide.js";
 
 export const addNewGuide = async (req, res) => {    
     try {
-        const { firstName, lastName, residence, phone, email, languages } = req.body
+        console.log(req.body)
+        const { station, firstName, lastName, residence, phone, email, languages, invoicing, fullAdress} = req.body
         const isExistingGuide = await Guide.findOne({firstName: firstName, lastName: lastName})
 
         if(isExistingGuide) {     
             throw new Error('Guide already exists')
         }
         const document = new Guide({
+            station: station,
             firstName: firstName,
             lastName: lastName,
             residence: residence,
             phone: phone,
             email: email,
-            languages: languages
+            languages: languages,
+            ...(invoicing !== undefined && { invoicing: invoicing }),
+            ...(fullAdress !== undefined && { fullAdress: fullAdress })
         })
         await document.save()
         res.status(201).json(document)
@@ -94,7 +98,7 @@ export const addGuideLanguage = async (req, res) => {
 
 export const addGuideTextField = async (req, res) => {
     try {
-        const allowedFields = ["lastName", "firstName", "phone", "email", "residence"];
+        const allowedFields = ["lastName", "firstName", "phone", "email", "residence", "invoicing", "fullAdress"];
         if (!allowedFields.includes(req.body.field)) {
             return res.status(400).json({ error: "Field is not existing" });
         }

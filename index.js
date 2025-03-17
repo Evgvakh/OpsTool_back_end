@@ -1,10 +1,12 @@
 import express from 'express'
 import cors from 'cors'
+import http from 'http'
+
 
 import { connectToDB } from './DB/DB.js'
 
 import { addNewGuide, addGuideBooking, findGuideByID, getAllGuides, removeGuideBooking, addGuideLanguage, addGuideTextField, addGuideWorkedHours, removeAllGuidesBookings } from './controllers/GuidesController.js';
-import { addCompany, addLanguage, addPort, addResidence, addShip, addUserRole, getCompanies, getLanguages, getPorts, getResidences, getShips, getRoles } from './controllers/Misc.js'
+import { addCompany, addLanguage, addPort, addResidence, addShip, addUserRole, getCompanies, getLanguages, getPorts, getResidences, getShips, getRoles, addGuideInvoicing, getGuideInvoicings, addStation, getStations } from './controllers/Misc.js'
 import { addCall, editCallField, getCalls } from './controllers/CallsController.js';
 import { addComment, editComment, getComments } from './controllers/CommentController.js';
 import { addUser, getUsers, userLogin, assignCallToUser, removeCallFromUser, createAndSendResetPasswordLink, resetUserPassword } from './controllers/UsersController.js';
@@ -15,11 +17,15 @@ import { assignCallSchema, userLoginSchema, userValidationSchema } from './valid
 import { callValidationSchema, editCallSchemaBody, editCallSchemaParams } from './validators/CallsValidations.js';
 import { assignCallNotification } from './Utils/Mailer.js';
 import { addBookingSchema, addWorkedHoursSchema, guideValidationSchema } from './validators/GuideValidations.js';
+import { initIOConnection } from './Socket.io/index.js';
 
 const app = express()
-await connectToDB();
 app.use(cors())
 app.use(express.json())
+const server = http.createServer(app)
+const io = initIOConnection(server)
+await connectToDB();
+
 
 app.get('/guides/get', getAllGuides)
 app.get('guide/get/:id', findGuideByID)
@@ -51,12 +57,16 @@ app.post('/company/add', checkIfAdmin, addCompany)
 app.post('/port/add', checkIfAdmin, addPort)
 app.post('/userrole/add', checkIfAdmin, addUserRole)
 app.post('/language/add', checkIfAdmin, addLanguage)
+app.post('/invoicing/add', checkIfAdmin, addGuideInvoicing)
+app.post('/station/add', checkIfAdmin, addStation)
 
 app.get('/residences/get', getResidences)
 app.get('/companies/get', getCompanies)
 app.get('/ports/get', getPorts)
 app.get('/ships/get', getShips)
 app.get('/languages/get', getLanguages)
+app.get('/invoicings/get', getGuideInvoicings)
+app.get('/stations/get', getStations)
 
 app.post('/comment/add', addComment)
 app.get('/comments/get', getComments)
@@ -64,13 +74,15 @@ app.put('/comment/edit', editComment)
 
 app.post('/mail/call_assign/send', assignCallNotification)
 
+
+
 app.use(errors())
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send({ errorMessage: err.message || 'Internal Server Error', data: null });
 });
 
-app.listen(4040, (err) => {
+server.listen(4040, (err) => {
     if (err) {
         console.log('Server down')
     } else {

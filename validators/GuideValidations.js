@@ -9,6 +9,9 @@ export const guideValidationSchema = Joi.object({
     languages: Joi.array().items(
         Joi.string().min(1)
     ),
+    fullAdress: Joi.string(),
+    invoicing: Joi.string(),
+    station: Joi.string().required()
 })
 
 export const addBookingSchema = Joi.object({

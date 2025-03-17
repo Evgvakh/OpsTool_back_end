@@ -4,6 +4,8 @@ import Ship from "../DB/Models/Ship.js";
 import Language from '../DB/Models/Language.js'
 import GuidesResidence from "../DB/Models/GuidesResidence.js";
 import Role from "../DB/Models/Role.js";
+import Invoicing from '../DB/Models/GuideInvoicing.js'
+import Station from "../DB/Models/Station.js";
 
 export const addPort = async (req, res) => {
     try {
@@ -163,6 +165,60 @@ export const addUserRole = async (req, res) => {
 export const getRoles = async (req, res) => {
     try {
         const data = await Role.find({}).sort({ name: 1 })
+        res.json(data)
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err.message, data: null })
+    }
+}
+
+export const addGuideInvoicing = async (req, res) => {
+    try {
+        const ifExist = await Invoicing.findOne({ name: req.body.name })
+        if (ifExist) {
+            throw new Error('This invoicing type already exists')
+        }
+        const data = new Invoicing({
+            name: req.body.name
+        })
+        await data.save()
+        res.json(data)
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err.message, data: null })
+    }
+}
+
+export const getGuideInvoicings = async (req, res) => {
+    try {
+        const data = await Invoicing.find({}).sort({ name: 1 })
+        res.json(data)
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err.message, data: null })
+    }
+}
+
+export const addStation = async (req, res) => {
+    try {
+        const ifExist = await Station.findOne({ name: req.body.name })
+        if (ifExist) {
+            throw new Error('This station already exists')
+        }
+        const data = new Station({
+            name: req.body.name
+        })
+        await data.save()
+        res.json(data)
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ message: err.message, data: null })
+    }
+}
+
+export const getStations = async (req, res) => {
+    try {
+        const data = await Station.find({}).sort({ name: 1 })
         res.json(data)
     } catch (err) {
         console.log(err)

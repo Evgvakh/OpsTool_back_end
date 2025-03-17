@@ -5,10 +5,8 @@ import { sendResetPasswordLink } from "../Utils/Mailer.js";
 
 export const addUser = async (req, res) => {
     try {
-        const isExistingUser = await User.findOne({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
+        const isExistingUser = await User.findOne({            
+            email: req.body.email
         })
 
         if (isExistingUser) {
@@ -30,7 +28,7 @@ export const addUser = async (req, res) => {
         res.status(200).send(user)
     } catch (err) {
         console.log(err)
-        res.status(400).json({ message: err.message, data: null })
+        res.status(400).send({errorMessage: err.message, data: null})
     }
 }
 
